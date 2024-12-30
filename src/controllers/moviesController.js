@@ -24,6 +24,7 @@ export const getMoviesController = async (req, res)=> {
         data,
     });
 };
+
 export const getMovieByIdController = async(req, res)=> {
     const {id} = req.params;
 
@@ -41,8 +42,6 @@ export const getMovieByIdController = async(req, res)=> {
 };
 
 export const addMovieController = async(req, res)=> {
-
-
     const data = await movieServices.addMovie(req.body);
 
     res.status(201).json({
@@ -53,7 +52,6 @@ export const addMovieController = async(req, res)=> {
 };
 
 export const upsertMovieController = async(req, res)=> {
-
     const {id} = req.params;
     const {isNew, data} = await movieServices.updateMovie(id, req.body, {upsert: true});
 
@@ -67,7 +65,6 @@ export const upsertMovieController = async(req, res)=> {
 };
 
 export const patchMovieController = async(req, res)=> {
-
     const {id} = req.params;
     const result = await movieServices.updateMovie(id, req.body);
 

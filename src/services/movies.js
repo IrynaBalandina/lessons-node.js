@@ -37,22 +37,20 @@ export const getMovieById = id => MovieCollection.findById(id);
 export const addMovie = payload => MovieCollection.create(payload);
 
 export const updateMovie = async (_id, payload, options = {}) => {
-    const {upsert = false} = options;
-    const result = await MovieCollection.findOneAndUpdate({_id}, payload, {
-        new: true,
-        upsert,
-        runValidators:true,
-        includeResultMetadata: true,
-    });
+const {upsert = false} = options;
+const result = await MovieCollection.findOneAndUpdate({_id}, payload, {
+    upsert,
+    includeResultMetadata: true,
+});
 
-    if(!result || !result.value) return null;
+if(!result || !result.value) return null;
 
-    const isNew = Boolean(result.lastErrorObject.upserted);
+const isNew = Boolean(result.lastErrorObject.upserted);
 
-    return {
-        isNew,
-        data: result.value,
-    };
+return {
+    isNew,
+    data: result.value,
+};
 };
 
 export const deleteMovie = filter => MovieCollection.findOneAndDelete(filter);

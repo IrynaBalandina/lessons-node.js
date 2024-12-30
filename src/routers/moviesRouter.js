@@ -6,19 +6,22 @@ import { ctrlWrapper } from "../utils/ctrlWrapper.js";
 import { validateBody } from "../utils/validateBody.js";
 import { movieAddSchema, movieUpdateSchema } from "../validation/movieSchema.js";
 import { isValidId } from "../middlewares/isValidId.js";
+import { authenticate } from "../middlewares/authenticate.js";
+
 
 const moviesRouter = Router();
+moviesRouter.use(authenticate);
 
 moviesRouter.get("/", ctrlWrapper(moviesController.getMoviesController));
 
-moviesRouter.get("/:id",isValidId,  ctrlWrapper(moviesController.getMovieByIdController));
+moviesRouter.get("/:id", isValidId, ctrlWrapper(moviesController.getMovieByIdController));
 
-moviesRouter.post("/",ctrlWrapper(moviesController.addMovieController));
+moviesRouter.post("/", validateBody(movieAddSchema), ctrlWrapper(moviesController.addMovieController));
 
-moviesRouter.put("/:id",isValidId,  validateBody(movieAddSchema), ctrlWrapper(moviesController.upsertMovieController));
+moviesRouter.put("/:id", isValidId, validateBody(movieAddSchema), ctrlWrapper(moviesController.upsertMovieController));
 
-moviesRouter.patch("/:id",isValidId,   validateBody(movieUpdateSchema), ctrlWrapper(moviesController.patchMovieController));
+moviesRouter.patch("/:id", isValidId, validateBody(movieUpdateSchema), ctrlWrapper(moviesController.patchMovieController));
 
-moviesRouter.delete("/:id",isValidId, ctrlWrapper(moviesController.deleteMovieController));
+moviesRouter.delete("/:id", isValidId, ctrlWrapper(moviesController.deleteMovieController));
 
 export default moviesRouter;
