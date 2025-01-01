@@ -19,6 +19,9 @@ if(filter.minReleaseYear) {
 if(filter.maxReleaseYear) {
     moviesQuery.where("releaseYear").lte(filter.maxReleaseYear);
 }
+if(filter.userId) {
+    moviesQuery.where("userId").equals(filter.userId);
+}
 
 const items = await moviesQuery.skip(skip).limit(limit).sort({[sortBy]: sortOrder});
 const total = await MovieCollection.find().merge(moviesQuery).countDocuments();

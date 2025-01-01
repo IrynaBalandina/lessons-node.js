@@ -9,6 +9,7 @@ export const getMoviesController = async (req, res)=> {
     const {page, perPage} = parsePaginationParams(req.query);
     const {sortBy, sortOrder} = parseSortParams(req.query, sortByList);
     const filter = parseMovieFilterParams(req.query);
+    filter.userId = req.user._id;
 
     const data = await movieServices.getMovies({
         page,
@@ -26,23 +27,25 @@ export const getMoviesController = async (req, res)=> {
 };
 
 export const getMovieByIdController = async(req, res)=> {
-    const {id} = req.params;
+ const {_id: userId} = req.user;
+    const {id: _id} = req.params;
 
-    const data = await movieServices.getMovieById(id);
+    const data = await movieServices.getMovie({_id, userId});
 
     if(!data) {
-        throw createError(404, `Movie with id=${id} not found`);
+        throw createError(404, `Movie with id=${_id} not found`);
     }
 
     res.json({
         status: 200,
-        message: `Successfully find movie with id=${id}`,
+        message: `Successfully find movie with id=${_id}`,
         data,
     });
 };
 
 export const addMovieController = async(req, res)=> {
-    const data = await movieServices.addMovie(req.body);
+    const {_id: userId} = req.user;
+    const data = await movieServices.addMovie({...req.body, userId});
 
     res.status(201).json({
         status: 201,
@@ -53,7 +56,8 @@ export const addMovieController = async(req, res)=> {
 
 export const upsertMovieController = async(req, res)=> {
     const {id} = req.params;
-    const {isNew, data} = await movieServices.updateMovie(id, req.body, {upsert: true});
+    const {_id: userId} = req.user;
+    const {isNew, data} = await movieServices.updateMovie(id, {...req.body, userId}, {upsert: true});
 
     const status = isNew ? 201 : 200;
 
@@ -65,11 +69,12 @@ export const upsertMovieController = async(req, res)=> {
 };
 
 export const patchMovieController = async(req, res)=> {
-    const {id} = req.params;
-    const result = await movieServices.updateMovie(id, req.body);
+    const {id: _id} = req.params;
+    const {_id: userId} = req.user;
+    const result = await movieServices.updateMovie({_id, userId}, req.body);
 
     if(!result) {
-        throw createError(404, `Movie with id=${id} not found`);
+        throw createError(404, `Movie with id=${_id} not found`);
     }
 
     res.json({
@@ -78,13 +83,13 @@ export const patchMovieController = async(req, res)=> {
         data: result.data,
     });
 };
-
 export const deleteMovieController = async(req, res)=> {
-    const {id} = req.params;
-    const data = await movieServices.deleteMovie({_id: id});
+    const {id: _id} = req.params;
+    const {_id: userId} = req.user;
+    const data = await movieServices.deleteMovie({_id, userId});
 
     if(!data) {
-        throw createError(404, `Movie with id=${id} not found`);
+        throw createError(404, `Movie with id=${_id} not found`);
     }
 
     res.status(204).send();

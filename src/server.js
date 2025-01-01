@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import moviesRouter from "./routers/moviesRouter.js";
  import authRouter from "./routers/auth.js";
@@ -13,6 +14,7 @@ export const startServer = ()=> {
 
     app.use(cors());
     app.use(express.json());
+    app.use(cookieParser());
     app.use(logger);
 
      app.use("/auth", authRouter);

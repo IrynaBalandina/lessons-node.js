@@ -26,6 +26,11 @@ const movieSchema = new Schema({
         enum: typeList,
         default: "film",
         required: true,
+    },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "user",
+        required: true,
     }
 }, {versionKey:false, timestamps: true});
 
