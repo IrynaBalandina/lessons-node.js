@@ -7,6 +7,7 @@ import { validateBody } from "../utils/validateBody.js";
 import { movieAddSchema, movieUpdateSchema } from "../validation/movieSchema.js";
 import { isValidId } from "../middlewares/isValidId.js";
 import { authenticate } from "../middlewares/authenticate.js";
+import { upload } from "../middlewares/multer.js";
 
 
 const moviesRouter = Router();
@@ -16,7 +17,10 @@ moviesRouter.get("/", ctrlWrapper(moviesController.getMoviesController));
 
 moviesRouter.get("/:id", isValidId, ctrlWrapper(moviesController.getMovieByIdController));
 
-moviesRouter.post("/", validateBody(movieAddSchema), ctrlWrapper(moviesController.addMovieController));
+// upload.fields([{name: "poster", maxCount: 1}, {name: "subposter", maxCount: 4}])
+// upload.array("poster", 8)
+
+moviesRouter.post("/", upload.single("poster"), validateBody(movieAddSchema), ctrlWrapper(moviesController.addMovieController));
 
 moviesRouter.put("/:id", isValidId, validateBody(movieAddSchema), ctrlWrapper(moviesController.upsertMovieController));
 

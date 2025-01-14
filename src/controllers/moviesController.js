@@ -4,6 +4,9 @@ import { parsePaginationParams } from "../utils/parsePaginationParams.js";
 import { parseSortParams } from "../utils/parseSortParams.js";
 import { sortByList } from "../db/models/Movie.js";
 import { parseMovieFilterParams } from "../utils/filters/parseMovieFilterParams.js";
+import {saveFileToUploadsDir} from "../utils/saveFileToUploadsDir.js";
+import { saveFileToCloudinary } from "../utils/saveFileToCloudinary.js";
+import { getEnvVar } from "../utils/getEnvVar.js";
 
 export const getMoviesController = async (req, res)=> {
     const {page, perPage} = parsePaginationParams(req.query);
@@ -44,8 +47,18 @@ export const getMovieByIdController = async(req, res)=> {
 };
 
 export const addMovieController = async(req, res)=> {
-    const {_id: userId} = req.user;
-    const data = await movieServices.addMovie({...req.body, userId});
+    const cloudinaryEnable = getEnvVar("CLOUDINARY_ENABLE") === "true";
+    let poster;
+    if(req.file) {
+        if(cloudinaryEnable) {
+            poster = await saveFileToCloudinary(req.file);
+        }
+        else {
+            poster = await saveFileToUploadsDir(req.file);
+        }
+    }
+   const {_id: userId} = req.user;
+ const data = await movieServices.addMovie({...req.body, poster, userId});
 
     res.status(201).json({
         status: 201,

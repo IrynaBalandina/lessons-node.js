@@ -27,6 +27,9 @@ const movieSchema = new Schema({
         default: "film",
         required: true,
     },
+    poster: {
+        type: String,
+    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: "user",
