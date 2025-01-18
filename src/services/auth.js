@@ -14,6 +14,8 @@ import {getEnvVar} from "../utils/getEnvVar.js";
 
 import { accessTokenLifetime, refreshTokenLifetime } from "../constants/user.js";
 import { TEMPLATES_DIR } from "../constants/index.js";
+import { validateCode, getUsernameFromGoogleTokenPayload } from "../utils/googleOauth2.js";
+import { response } from "express";
 
 
 
@@ -122,6 +124,32 @@ export const refreshToken = async(payload)=>{
         ...sessionData,
     });
 };
+
+export const loginOrRegisterWithGoogle = async code => {
+    const loginTicket = await validateCode(code);
+    const payload = loginTicket.getPayload();
+
+    let user = await UserCollection.findOne({email: payload.email});
+    if(!user) {
+        const username = getUsernameFromGoogleTokenPayload(payload);
+        const password = await bcrypt.hash(randomBytes(10).toString("base64"), 10);
+
+        user = await UserCollection.create({
+            email: payload.email,
+            username,
+            password,
+        });
+    }
+
+    const sessionData = createSessionData();
+
+    return SessionCollection.create({
+        userId: user._id,
+        ...sessionData,
+    });
+};
+
+
 
 export const logout = async sessionId => {
     await SessionCollection.deleteOne({_id: sessionId});
